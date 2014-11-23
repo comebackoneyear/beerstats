@@ -8,25 +8,68 @@ OneWire ourWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&ourWire);
 
 volatile int bcount=0;
+int ledPin = 13;
+bool cmdhelp = FALSE;
+
 void setup() {
   Serial.begin(115200);
   attachInterrupt(0, bubble, CHANGE);
+  pinMode(ledPin, OUTPUT);
   sensors.begin();
 }
 
 void loop() {
-	temp();
-	Serial.print(" ");
-	light();
-	Serial.print(" ");
-	bubbles();
-	Serial.println("");
-	delay(10000);
+	char command;
+
+	// print help once
+	if(cmdhelp == FALSE) Serial.println("# Ready for command (T(emperature)|L(ight)|B(ubbles)|A(all))");
+	cmdhelp = TRUE;
+
+	// send data only when you receive data:
+	if (Serial.available() > 0) {
+		command = Serial.read();
+		digitalWrite(ledPin, HIGH);
+		switch(command) {
+			case 'T':
+				temp();
+				newline();
+				break;
+			case 'L':
+				light();
+				newline();
+				break;
+			case 'B':
+				light();
+				newline();
+				break;
+			case 'A':
+				temp();
+				space();
+				light();
+				space();
+				bubbles();
+				newline();
+				break;
+			default:
+				cmdhelp = FALSE;
+				break;
+		}
+		digitalWrite(ledPin, LOW);
+		command = '\0';
+	}
+	delay(30);
 }
 void temp() {
   sensors.requestTemperatures();
   Serial.print("celsius:");
   Serial.print(sensors.getTempCByIndex(0));
+}
+
+void newline() {
+	Serial.println("");
+}
+void space() {
+	Serial.print(" ");
 }
 
 void light() {
@@ -49,7 +92,7 @@ void light() {
 void bubbles() {
 	int bubblecount=0;
 	if(bcount>=8) {
-		bubblecount+=bcount/8;
+		bubblecount=bcount;
 		bcount=0;
 	}
 	Serial.print("bubbles:");
