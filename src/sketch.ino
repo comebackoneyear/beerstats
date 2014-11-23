@@ -39,7 +39,7 @@ void loop() {
 				newline();
 				break;
 			case 'B':
-				light();
+				bubbles();
 				newline();
 				break;
 			case 'A':
