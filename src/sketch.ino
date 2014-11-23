@@ -12,7 +12,7 @@ int ledPin = 13;
 bool cmdhelp = FALSE;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   attachInterrupt(0, bubble, CHANGE);
   pinMode(ledPin, OUTPUT);
   sensors.begin();
@@ -81,6 +81,7 @@ void light() {
 	float avg = 0;
 	for(int i =0; i<200; i++) {
 		avg += analogRead(analogPin);
+		delay(1);
 	}
 	raw = avg/200; 
 	buffer= raw * Vin;
